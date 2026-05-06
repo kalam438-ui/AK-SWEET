@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitives
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email.lower() == 'kalam438@gmail.com' && request.auth.token.email_verified == true)
+      ); 
+    }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // Phase 2 & 4: Products
+    match /products/{productId} {
+      function isValidProduct(data) {
+        return data.name is string && data.name.size() > 0 && data.name.size() < 100
+            && data.price is string && data.price.size() > 0 && data.price.size() < 50
+            && data.img is string && data.img.size() > 0 && data.img.size() < 1000
+            && (data.keys().hasAll(['name', 'price', 'img']));
+      }
+
+      allow read: if true; // Public catalog
+      allow create: if isAdmin() && isValidProduct(incoming()) && isValidId(productId);
+      allow update: if isAdmin() && isValidProduct(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /gallery/{itemId} {
+      function isValidGalleryItem(data) {
+        return data.url is string && data.url.size() > 0 
+            && (data.type == 'image' || data.type == 'video');
+      }
+
+      allow read: if true;
+      allow create: if isAdmin() && isValidGalleryItem(incoming()) && isValidId(itemId);
+      allow update: if isAdmin() && isValidGalleryItem(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      function isValidTestimonial(data) {
+        return data.name is string && data.name.size() > 0
+            && data.text is string && data.text.size() > 0
+            && data.rating is number && data.rating >= 1 && data.rating <= 5;
+      }
+      allow read: if true;
+      allow create: if isAdmin() && isValidTestimonial(incoming()) && isValidId(testimonialId);
+      allow update: if isAdmin() && isValidTestimonial(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Admins collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn() && request.auth.uid == adminId;
+      allow create: if isSignedIn() 
+                  && request.auth.uid == adminId 
+                  && request.auth.token.email.lower() == 'kalam438@gmail.com';
+      allow write: if false; 
+    }
+
+    match /orders/{orderIdDoc} {
+      function isValidOrder(data) {
+        return data.orderId is string && data.orderId.size() > 0
+            && data.status in ["Processing", "Baking", "Out for Delivery", "Delivered", "Cancelled"];
+      }
+      allow get: if true; // Tracking is public if you have the ID
+      allow list: if isAdmin();
+      allow create: if isAdmin() && isValidOrder(incoming()) && isValidId(orderIdDoc);
+      allow update: if isAdmin() && isValidOrder(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      function isValidCategory(data) {
+        return data.name is string && data.name.size() > 0 && data.name.size() < 100;
+      }
+      allow read: if true;
+      allow create: if isAdmin() && isValidCategory(incoming()) && isValidId(categoryId);
+      allow update: if isAdmin() && isValidCategory(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "entities": {
+    "product": {
+      "title": "Product",
+      "description": "A sweet item available for purchase",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Display name of the sweet" },
+        "price": { "type": "string", "description": "Price with currency or weight unit" },
+        "desc": { "type": "string", "description": "Brief description of ingredients or taste" },
+        "img": { "type": "string", "description": "URL to the product image" },
+        "category": { "type": "string", "description": "Category like 'Baklava', 'Cake', etc." },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "img"]
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "User with editing privileges",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin"] }
+      },
+      "required": ["email", "role"]
+    },
+    "galleryItem": {
+      "title": "Gallery Item",
+      "description": "An image or video for the home gallery",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "type": { "type": "string", "enum": ["image", "video"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "type"]
+    },
+    "settings": {
+      "title": "Site Settings",
+      "description": "General site configuration",
+      "type": "object",
+      "properties": {
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "heroImage": { "type": "string" },
+        "logo": { "type": "string" },
+        "established": { "type": "string" },
+        "whatsappNumber": { "type": "string", "description": "International format without '+' e.g. 96891234567" },
+        "storyTitle": { "type": "string" },
+        "storySubtitle": { "type": "string" },
+        "storyDescription": { "type": "string" },
+        "storyImage": { "type": "string" },
+        "storyPoint1": { "type": "string" },
+        "storyPoint2": { "type": "string" },
+        "footerDescription": { "type": "string" },
+        "instagramUrl": { "type": "string" },
+        "facebookUrl": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "workingHoursMonFri": { "type": "string" },
+        "workingHoursSat": { "type": "string" },
+        "workingHoursSun": { "type": "string" }
+      }
+    },
+    "testimonial": {
+      "title": "Testimonial",
+      "description": "Customer review/feedback",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "text": { "type": "string" },
+        "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+        "avatar": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "text", "rating"]
+    },
+    "order": {
+      "title": "Order",
+      "description": "A customer order for tracking",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "description": "Publicly shareable tracking ID" },
+        "customerName": { "type": "string" },
+        "status": { "type": "string", "enum": ["Processing", "Baking", "Out for Delivery", "Delivered", "Cancelled"] },
+        "itemsSummary": { "type": "string" },
+        "estimatedDelivery": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["orderId", "status"]
+    },
+    "category": {
+      "title": "Category",
+      "description": "Product category management",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "product",
+      "description": "Collection of sweets available in the shop"
+    },
+    "/admins/{adminId}": {
+      "schema": "admin",
+      "description": "Authorized administrators"
+    },
+    "/gallery/{itemId}": {
+      "schema": "galleryItem",
+      "description": "Home page gallery items"
+    },
+    "/settings/{settingId}": {
+      "schema": "settings",
+      "description": "Global user settings"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "testimonial",
+      "description": "Customer reviews and feedback"
+    },
+    "/orders/{orderIdDoc}": {
+      "schema": "order",
+      "description": "Order tracking information"
+    },
+    "/categories/{categoryId}": {
+      "schema": "category",
+      "description": "Managed product categories"
+    }
+  }
+}

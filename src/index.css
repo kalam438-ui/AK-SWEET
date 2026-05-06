@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Libre Baskerville", "Georgia", serif;
+  --color-brand-primary: #2D2421; /* Rich Espresso */
+  --color-brand-accent: #B8860B; /* Dark Goldenrod */
+  --color-brand-secondary: #D4AF37; /* Metallic Gold */
+  --color-brand-warm: #F9F7F2; /* Soft Cream */
+  --color-brand-border: #E8E2D9;
+  --color-brand-muted: #F2EBE1;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-warm text-brand-primary font-sans;
+  }
+  
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+}
+
+.arabic-reveal {
+  @apply opacity-0;
+  animation: reveal 0.8s ease-out forwards;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
